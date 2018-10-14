@@ -12,6 +12,7 @@
 
 import React from "react";
 import './FollowersChart.css'
+import { toDateAndFollowersArray, timeSeries, toDateAndDeltaFollowersArray } from './utils'
 import { Charts, ChartContainer, ChartRow, YAxis, LineChart, BarChart, Resizable, Baseline, styler } from "react-timeseries-charts";
 import { TimeSeries, TimeRange, Index } from "pondjs";
 
@@ -72,65 +73,16 @@ class FollowersChart extends React.Component {
   componentDidMount = () => {
     fetch("https://g43v3qwvj7.execute-api.eu-west-3.amazonaws.com/dev/followers")
       .then(res => res.json())
-      .then(datas => {
-        const hoursFollowers = datas.map(timestamp => {
-          return [new Date(timestamp.checkedDate.S), parseInt(timestamp.followers.N, 10)]
-        })
-        hoursFollowers.sort(function(a, b){
-          return a[0] - b[0];
-        })
+      .then(data => {
 
-        //console.log(hoursFollowers)
+        const hoursAndFollowersArray = toDateAndFollowersArray(data)
+        const hoursSeries = timeSeries('Followers', hoursAndFollowersArray, '1h')
 
-        const hoursSeriesTime = hoursFollowers.map(([date, followers]) => {
-          return [date.getTime(), followers]
-        })
+        //const daysFollowersMap = this.daysFollowers(hoursFollowers)
+        //const daysFollowers = Object.entries(daysFollowersMap)
 
-        const daysFollowersMap = this.daysFollowers(hoursFollowers)
-        const daysFollowers = Object.entries(daysFollowersMap)
-
-        // console.log(daysFollowers)
-        // const daysSeriesTime = daysFollowers.map(([date, followers]) => {
-        //   console.log("date ", date)
-        //   console.log("followers ", followers)
-        //   return [date.getTime(), followers]
-        // })
-
-        // timeSeries.sort(function(a, b){
-        //   return a[0] - b[0];
-        // })
-
-        //console.log('TimeSeries', timeSeries)
-        // hoursFollowers.forEach(([date, followers]) => {
-        //   //console.log(this.daysIntoYear(date))
-        //   //console.log(date.getMonth())
-        // })
-        const deltaFollowersSeries =  this.calculateSeriesDelta(hoursSeriesTime)
-        // const dates = datas.map(timestamp => {
-        //   return [new Date(timestamp.checkedDate.S), parseInt(timestamp.followers.N, 10)]
-        // })
-
-        // dates.sort(function(a, b){
-        //   return a[0].getTime() - b[0].getTime();
-        // });
-
-        const hoursSeries = new TimeSeries({
-          name: "Followers",
-          columns: ["index", "value"],
-          points: hoursSeriesTime.map(([d, value]) => [Index.getIndexString("1h", new Date(d)), value])
-        });
-
-        // const daysSeries = new TimeSeries({
-        //   name: "Followers",
-        //   columns: ["index", "value"],
-        //   points: hoursSeriesTime.map(([d, value]) => [Index.getIndexString("1d", new Date(d)), value])
-        // });
-
-        const deltaHoursSeries = new TimeSeries({
-          name: "Followers",
-          columns: ["index", "value"],
-          points: deltaFollowersSeries.map(([d, value]) => [Index.getIndexString("1h", new Date(d)), value])
-        });
+        const deltaHoursAndFollowersArray =  toDateAndDeltaFollowersArray(hoursAndFollowersArray)
+        const deltaHoursSeries = timeSeries('Followers', deltaHoursAndFollowersArray, '1h')
 
         this.setState((state) => {
           return {
@@ -170,17 +122,6 @@ class FollowersChart extends React.Component {
       return accumulator
     },
     {})
-  }
-
-  daysIntoYear = (date) =>  {
-    return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
-  }
-
-  calculateSeriesDelta = (orderedTimeSeries) => {
-    return orderedTimeSeries.map((value, index, array) => {
-      const delta = index > 0 ? value[1] - array[index-1][1] : 0
-      return [value[0], delta]
-    })
   }
 
   handleTrackerChanged = tracker => {
