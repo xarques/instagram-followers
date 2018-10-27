@@ -1,5 +1,6 @@
 import { TimeSeries, TimeRange, Index } from "pondjs";
 import sample from './examples/data/dataSample-interval-hour.json'
+import sample2days from './examples/data/dataSample-interval-hour-2days.json'
 import { toDateAndFollowersArray, toDateAndDeltaFollowersArray, timeSeries } from './utils'
 
 const expectedDateAndFollowersArray = [
@@ -57,4 +58,12 @@ test('delta time Series', () => {
   expect(series.name()).toEqual('Followers')
   expect(series.columns()).toEqual(['value'])
   expect(JSON.stringify(events)).toEqual(JSON.stringify(expectedDeltaTimeSeriesEvents))
+})
+
+test('keep last day', () => {
+  const array = toDateAndFollowersArray(sample2days)
+  expect(array.length).toEqual(28)
+  const series = timeSeries('Followers', array, '1h', 24)
+  const events = series.collection().eventList()
+  expect(events.size).toEqual(24)
 })

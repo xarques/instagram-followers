@@ -15,13 +15,25 @@ const toDateAndDeltaFollowersArray = (dateAndFollowersArray) => {
   })
 }
 
-const timeSeries = (name, array, interval) => {
+const timeSeries = (name, array, interval, deep) => {
+  let resizedArray = array
+
+  if (deep && array.length > deep) {
+    resizedArray = array.slice(array.length - deep, array.length)
+  }
   return new TimeSeries({
   name: name,
   columns: ["index", "value"],
-  points: array.map(([d, value]) => [Index.getIndexString(interval, d), value])
+  points: resizedArray.map(([d, value]) => [Index.getIndexString(interval, d), value])
   })
 }
+
+
+
+// var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+// var today  = new Date();
+
+// console.log(today.toLocaleDateString("en-US"));
 
 const daysIntoYear = (date) =>  {
   return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
