@@ -11,6 +11,7 @@
 /* eslint max-len:0 */
 
 import React from "react";
+
 import './FollowersChart.css'
 import { toDateAndFollowersArray, timeSeries, toDateAndDeltaFollowersArray } from './utils'
 import { Charts, ChartContainer, ChartRow, YAxis, LineChart, BarChart, Resizable, Baseline, styler } from "react-timeseries-charts";
@@ -72,7 +73,8 @@ class FollowersChart extends React.Component {
   }
 
   componentDidMount = () => {
-    fetch("https://g43v3qwvj7.execute-api.eu-west-3.amazonaws.com/dev/followers")
+    const accountId = this.props.match.params.accountId || 'adrelanine'
+    fetch(`https://g43v3qwvj7.execute-api.eu-west-3.amazonaws.com/dev/followers/${accountId}`)
       .then(res => res.json())
       .then(data => {
 
@@ -146,9 +148,11 @@ class FollowersChart extends React.Component {
 
   render() {
     const { hoursSeries, deltaHoursSeries, interval } = this.state;
+    const accountId = this.props.match.params.accountId || 'adrelanine'
 
     return (
       <div className="followersChart">
+        <h1>{accountId}</h1>
         <div className="dateInterval">
           <button className={`button ${interval === 24 ? 'button-selected' : ''}`} onClick={() => this.onClick(24)}>1D</button>
           <button className={`button ${interval === 24*7 ? 'button-selected' : ''}`} onClick={() => this.onClick(24*7)}>1W</button>
