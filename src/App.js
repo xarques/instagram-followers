@@ -8,7 +8,7 @@ class App extends Component {
     return (
       <div>
         <Switch>
-          <Route exact path="/:accountId" component={FollowersChart}/>
+          <Route exact path="/instagram-followers/:accountId" component={FollowersChart}/>
           <Route component={FollowersChart} />
         </Switch>
       </div>
