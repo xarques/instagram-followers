@@ -6,6 +6,16 @@ h1 {
   margin: 30px;
 }
 
+.graphTitle {
+  margin: 0px 20px 0px 20px;
+  display: flex;
+  justify-content: space-between
+}
+
+.graphTitle p {
+  font-size: 20px;
+}
+
 .dateInterval {
   display: flex;
   justify-content: center;

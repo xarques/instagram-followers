@@ -76,12 +76,8 @@ class FollowersChart extends React.Component {
     fetch(`https://g43v3qwvj7.execute-api.eu-west-3.amazonaws.com/dev/followers/${accountId}`)
       .then(res => res.json())
       .then(data => {
-
         const hoursAndFollowersArray = toDateAndFollowersArray(data)
         const hoursSeries = timeSeries('Followers', hoursAndFollowersArray, '1h', 24)
-
-        //const daysFollowersMap = this.daysFollowers(hoursFollowers)
-        //const daysFollowers = Object.entries(daysFollowersMap)
 
         const deltaHoursAndFollowersArray =  toDateAndDeltaFollowersArray(hoursAndFollowersArray)
         const deltaHoursSeries = timeSeries('Followers', deltaHoursAndFollowersArray, '1h', 24)
@@ -97,28 +93,6 @@ class FollowersChart extends React.Component {
         });
       });
   }
-
-  // daysFollowers = (followers) => {
-  //   const result = []
-  //   //let currentDay
-  //   let previousDayInYear
-  //   followers.forEach(([date, instantFollowers]) => {
-  //     const dayInYear = this.daysIntoYear(date)
-  //     console.log("dayInYear", dayInYear)
-  //     console.log("instantFollowers", instantFollowers)
-
-  //     if (!previousDayInYear) {
-  //       previousDayInYear = [dayInYear, instantFollowers]
-  //     } else if (previousDayInYear[0] !== dayInYear) {
-  //       result.push(previousDayInYear)
-  //       previousDayInYear = [dayInYear, instantFollowers]
-  //     }
-  //   })
-  //   result.push(previousDayInYear)
-  //   console.log('result ', result)
-
-
-  // }
 
   daysFollowers = (followers) => {
     return followers.reduce((accumulator, current) => {
@@ -151,108 +125,75 @@ class FollowersChart extends React.Component {
         </div>
 
         { hoursSeries &&
-        <Resizable>
-          <ChartContainer
-          title="Total Followers"
-          timeRange={hoursSeries.range()}
-          titleStyle={{ fill: "#555", fontWeight: 500, fontSize: '1.5em' }}
-          // format="%b '%y"
-          // timeAxisTickCount={5}
-          >
-            <ChartRow height="150">
-              <YAxis
-                id="followers"
-                label="Followers"
-                min={hoursSeries.min()}
-                max={hoursSeries.max()}
-                width="60"
-                format=".1f"
-                type="linear"
-              />
-              <Charts>
-                <LineChart
-                  axis="followers"
-                  series={hoursSeries}
-                  style={style}
+        <div>
+          <div className="graphTitle">
+            <p>Total Followers</p>
+            <p>{hoursSeries.atLast().get("value")}</p>
+          </div>
+          <Resizable>
+            <ChartContainer
+            timeRange={hoursSeries.range()}
+            titleStyle={{ fill: "#555", fontWeight: 500, fontSize: '1.5em' }}
+            // format="%b '%y"
+            // timeAxisTickCount={5}
+            >
+              <ChartRow height="150">
+                <Charts>
+                  <LineChart
+                    axis="followers"
+                    series={hoursSeries}
+                    style={style}
+                  />
+                </Charts>
+                <YAxis
+                  id="followers"
+                  min={hoursSeries.min()}
+                  max={hoursSeries.max()}
+                  width="60"
+                  format=".1f"
+                  type="linear"
+                  showGrid
                 />
-                {/* <BarChart
-                  axis="followers"
-                  series={hoursSeries}
-                  style={style}
-                  //spacing={2}
-                  info={[{label: "value", value: "3"}]}
-                  columns={["value"]}
-                  selection={this.state.selection}
-                  onSelectionChange={selection => this.setState({selection})}
-                /> */}
-                <Baseline
-                  axis="followers"
-                  style={baselineStyleLite}
-                  value={hoursSeries.max()}
-                  label={`Max ${hoursSeries.max()}`}
-                  position="right"
-                />
-                {/* <Baseline
-                  axis="followers"
-                  style={baselineStyleLite}
-                  value={series.min()}
-                  label={`Min ${series.min()}`}
-                  position="right"
-                /> */}
-                <Baseline
-                  axis="followers"
-                  style={baselineStyleExtraLite}
-                  value={hoursSeries.avg() - hoursSeries.stdev()}
-                />
-                <Baseline
-                  axis="followers"
-                  style={baselineStyleExtraLite}
-                  value={hoursSeries.avg() + hoursSeries.stdev()}
-                />
-                <Baseline
-                  axis="followers"
-                  style={baselineStyle}
-                  value={hoursSeries.avg()}
-                  label={`Avg ${Math.round(hoursSeries.avg())}`}
-                  position="right"
-                />
-              </Charts>
-            </ChartRow>
-          </ChartContainer>
-        </Resizable>}
+              </ChartRow>
+            </ChartContainer>
+          </Resizable>
+        </div>}
         { hoursSeries &&
-        <Resizable>
-          <ChartContainer
-          title="New Followers"
-          timeRange={hoursSeries.range()}
-          titleStyle={{ fill: "#555", fontWeight: 500, fontSize: '1.5em' }}
-          // format="%b '%y"
-          // timeAxisTickCount={5}
-          >
-            <ChartRow height="150">
-              <YAxis
-                id="deltaFollowers"
-                label="Delta"
-                min={deltaHoursSeries.min()}
-                max={deltaHoursSeries.max()}
-                width="60"
-                format=".1f"
-                type="linear"
-              />
-              <Charts>
-                <BarChart
-                  axis="deltaFollowers"
-                  series={deltaHoursSeries}
-                  style={style}
-                  //spacing={2}
-                  columns={["value"]}
-                  selection={this.state.selection}
-                  onSelectionChange={selection => this.setState({selection})}
+        <div>
+          <div className="graphTitle">
+            <p>New Followers</p>
+            <p>{deltaHoursSeries.sum()}</p>
+          </div>
+          <Resizable>
+            <ChartContainer
+            timeRange={hoursSeries.range()}
+            titleStyle={{ fill: "#555", fontWeight: 500, fontSize: '1.5em' }}
+            >
+              <ChartRow height="150">
+                <Charts>
+                  <BarChart
+                    axis="deltaFollowers"
+                    series={deltaHoursSeries}
+                    style={style}
+                    //spacing={2}
+                    columns={["value"]}
+                    selection={this.state.selection}
+                    onSelectionChange={selection => this.setState({selection})}
+                  />
+                </Charts>
+                <YAxis
+                  id="deltaFollowers"
+                  min={deltaHoursSeries.min()}
+                  max={deltaHoursSeries.max()}
+                  width="60"
+                  format=".1f"
+                  type="linear"
+                  showGrid
                 />
-              </Charts>
-            </ChartRow>
-         </ChartContainer>
-        </Resizable>}
+              </ChartRow>
+          </ChartContainer>
+          </Resizable>
+        </div>}
       </div>
     );
   }
