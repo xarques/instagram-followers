@@ -67,7 +67,6 @@ class FollowersChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tracker: null,
       interval: 24
     };
   }
@@ -128,15 +127,6 @@ class FollowersChart extends React.Component {
     },
     {})
   }
-
-  handleTrackerChanged = tracker => {
-    this.setState({ tracker });
-  };
-
-  handleTimeRangeChange = timerange => {
-    this.setState({ timerange });
-  };
-
   onClick = (interval) => {
     this.setState(state => ({
       ...state,

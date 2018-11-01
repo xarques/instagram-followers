@@ -10,7 +10,7 @@
     "react-dom": "^16.6.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.5",
-    "react-timeseries-charts": "^0.15.3"
+    "react-timeseries-charts": "git+https://github.com/esnet/react-timeseries-charts"
   },
   "scripts": {
     "start": "react-scripts start",
