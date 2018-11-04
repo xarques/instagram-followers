@@ -13,7 +13,16 @@
 import React from "react";
 
 import './FollowersChart.css'
-import { toDateAndFollowersArray, timeSeries, toDateAndDeltaFollowersArray } from './utils'
+import {
+  toDateAndFollowersArray,
+  buildTimeSeries,
+  buildIndexTimeSeries,
+  toDateAndDeltaFollowersArray,
+  buildFullTimeSeries,
+  buildCroppedTimeSeries,
+  buildCroppedTimeSeriesDelta
+}
+  from './utils'
 import { Charts, ChartContainer, ChartRow, YAxis, LineChart, BarChart, Resizable, Baseline, styler } from "react-timeseries-charts";
 import { TimeSeries, TimeRange, Index } from "pondjs";
 
@@ -67,7 +76,7 @@ class FollowersChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      interval: 24
+      interval: '1d'
     };
   }
 
@@ -77,62 +86,58 @@ class FollowersChart extends React.Component {
       .then(res => res.json())
       .then(data => {
         const hoursAndFollowersArray = toDateAndFollowersArray(data)
-        const hoursSeries = timeSeries('Followers', hoursAndFollowersArray, '1h', 24)
+        const fullFollowersSeries = buildFullTimeSeries('Followers', hoursAndFollowersArray)
+        const croppedFollowersSeries = buildCroppedTimeSeries(fullFollowersSeries, '1h')
 
         const deltaHoursAndFollowersArray =  toDateAndDeltaFollowersArray(hoursAndFollowersArray)
-        const deltaHoursSeries = timeSeries('Followers', deltaHoursAndFollowersArray, '1h', 24)
+        const fullDeltaFollowersSeries = buildFullTimeSeries('Followers', deltaHoursAndFollowersArray)
+        const croppedDeltaFollowersSeries = buildCroppedTimeSeriesDelta(fullDeltaFollowersSeries, '1h')
 
         this.setState((state) => {
           return {
             ...state,
-            hoursAndFollowersArray,
-            deltaHoursAndFollowersArray,
-            hoursSeries,
-            deltaHoursSeries
+            fullFollowersSeries,
+            croppedFollowersSeries,
+            fullDeltaFollowersSeries,
+            croppedDeltaFollowersSeries,
           }
         });
       });
   }
 
-  daysFollowers = (followers) => {
-    return followers.reduce((accumulator, current) => {
-      accumulator[this.daysIntoYear(current[0])] = current[1]
-      return accumulator
-    },
-    {})
-  }
   onClick = (interval) => {
     this.setState(state => ({
       ...state,
       interval: interval,
-      hoursSeries: timeSeries('Followers', state.hoursAndFollowersArray, '1h', interval),
-      deltaHoursSeries: timeSeries('Followers', state.deltaHoursAndFollowersArray, '1h', interval)
+      croppedFollowersSeries: buildCroppedTimeSeries(state.fullFollowersSeries, interval),
+      croppedDeltaFollowersSeries: buildCroppedTimeSeriesDelta(state.fullDeltaFollowersSeries, interval)
+
     }))
   }
 
   render() {
-    const { hoursSeries, deltaHoursSeries, interval } = this.state;
+    const { interval, croppedFollowersSeries, croppedDeltaFollowersSeries } = this.state;
     const accountId = this.props.match.params.accountId || 'adrelanine'
 
     return (
       <div className="followersChart">
         <h1>{accountId}</h1>
         <div className="dateInterval">
-          <button className={`button ${interval === 24 ? 'button-selected' : ''}`} onClick={() => this.onClick(24)}>1D</button>
-          <button className={`button ${interval === 24*7 ? 'button-selected' : ''}`} onClick={() => this.onClick(24*7)}>1W</button>
-          <button className={`button ${interval === 24*7*31 ? 'button-selected' : ''}`} onClick={() => this.onClick(24*7*31)}>1M</button>
-          <button className={`button ${interval === 24*7*31*3 ? 'button-selected' : ''}`} onClick={() => this.onClick(24*7*31*3)}>3M</button>
+          <button className={`button ${interval === '1d' ? 'button-selected' : ''}`} onClick={() => this.onClick('1d')}>1D</button>
+          <button className={`button ${interval === '1w' ? 'button-selected' : ''}`} onClick={() => this.onClick('1w')}>1W</button>
+          <button className={`button ${interval === '1m' ? 'button-selected' : ''}`} onClick={() => this.onClick('1m')}>1M</button>
+          <button className={`button ${interval === '3m' ? 'button-selected' : ''}`} onClick={() => this.onClick('3m')}>3M</button>
         </div>
 
-        { hoursSeries &&
+        { croppedFollowersSeries &&
         <div>
           <div className="graphTitle">
             <p>Total Followers</p>
-            <p>{hoursSeries.atLast().get("value")}</p>
+            <p>{croppedFollowersSeries.atLast().get("value")}</p>
           </div>
           <Resizable>
             <ChartContainer
-            timeRange={hoursSeries.range()}
+            timeRange={croppedFollowersSeries.range()}
             titleStyle={{ fill: "#555", fontWeight: 500, fontSize: '1.5em' }}
             // format="%b '%y"
             // timeAxisTickCount={5}
@@ -141,14 +146,14 @@ class FollowersChart extends React.Component {
                 <Charts>
                   <LineChart
                     axis="followers"
-                    series={hoursSeries}
+                    series={croppedFollowersSeries}
                     style={style}
                   />
                 </Charts>
                 <YAxis
                   id="followers"
-                  min={hoursSeries.min()}
-                  max={hoursSeries.max()}
+                  min={croppedFollowersSeries.min()}
+                  max={croppedFollowersSeries.max()}
                   width="60"
                   format=".1f"
                   type="linear"
@@ -158,22 +163,22 @@ class FollowersChart extends React.Component {
             </ChartContainer>
           </Resizable>
         </div>}
-        { hoursSeries &&
+        { croppedDeltaFollowersSeries &&
         <div>
           <div className="graphTitle">
             <p>New Followers</p>
-            <p>{deltaHoursSeries.sum()}</p>
+            <p>{croppedDeltaFollowersSeries.sum()}</p>
           </div>
           <Resizable>
             <ChartContainer
-            timeRange={hoursSeries.range()}
+            timeRange={croppedDeltaFollowersSeries.range()}
             titleStyle={{ fill: "#555", fontWeight: 500, fontSize: '1.5em' }}
             >
               <ChartRow height="150">
                 <Charts>
                   <BarChart
                     axis="deltaFollowers"
-                    series={deltaHoursSeries}
+                    series={croppedDeltaFollowersSeries}
                     style={style}
                     //spacing={2}
                     columns={["value"]}
@@ -183,8 +188,8 @@ class FollowersChart extends React.Component {
                 </Charts>
                 <YAxis
                   id="deltaFollowers"
-                  min={deltaHoursSeries.min()}
-                  max={deltaHoursSeries.max()}
+                  min={croppedDeltaFollowersSeries.min()}
+                  max={croppedDeltaFollowersSeries.max()}
                   width="60"
                   format=".1f"
                   type="linear"
