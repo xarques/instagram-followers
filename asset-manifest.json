@@ -1,6 +1,13 @@
 {
-  "main.css": "static/css/main.1324ec48.css",
-  "main.css.map": "static/css/main.1324ec48.css.map",
-  "main.js": "static/js/main.be90593a.js",
-  "main.js.map": "static/js/main.be90593a.js.map"
+  "main.css": "/instagram-followers/static/css/main.d544b1f6.chunk.css",
+  "main.js": "/instagram-followers/static/js/main.6cd7ac45.chunk.js",
+  "main.js.map": "/instagram-followers/static/js/main.6cd7ac45.chunk.js.map",
+  "static/js/1.b5468bf7.chunk.js": "/instagram-followers/static/js/1.b5468bf7.chunk.js",
+  "static/js/1.b5468bf7.chunk.js.map": "/instagram-followers/static/js/1.b5468bf7.chunk.js.map",
+  "runtime~main.js": "/instagram-followers/static/js/runtime~main.f9e3b5bf.js",
+  "runtime~main.js.map": "/instagram-followers/static/js/runtime~main.f9e3b5bf.js.map",
+  "static/css/main.d544b1f6.chunk.css.map": "/instagram-followers/static/css/main.d544b1f6.chunk.css.map",
+  "index.html": "/instagram-followers/index.html",
+  "precache-manifest.2ddd0eec96e644e20585db305ccff088.js": "/instagram-followers/precache-manifest.2ddd0eec96e644e20585db305ccff088.js",
+  "service-worker.js": "/instagram-followers/service-worker.js"
 }
