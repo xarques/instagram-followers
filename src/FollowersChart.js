@@ -28,7 +28,6 @@ import {
   LineChart,
   BarChart,
   Resizable,
-  Baseline,
   styler
 } from "react-timeseries-charts";
 
@@ -40,41 +39,6 @@ import {
 // };
 
 const style = styler([{ key: "value", color: "#A5C8E1" }]);
-
-const baselineStyle = {
-  line: {
-    stroke: "steelblue",
-    strokeWidth: 1,
-    opacity: 0.4,
-    strokeDasharray: "none"
-  },
-  label: {
-    fill: "steelblue"
-  }
-};
-
-const baselineStyleLite = {
-  line: {
-    stroke: "steelblue",
-    strokeWidth: 1,
-    opacity: 0.5
-  },
-  label: {
-    fill: "steelblue"
-  }
-};
-
-const baselineStyleExtraLite = {
-  line: {
-    stroke: "steelblue",
-    strokeWidth: 1,
-    opacity: 0.2,
-    strokeDasharray: "1,1"
-  },
-  label: {
-    fill: "steelblue"
-  }
-};
 
 class FollowersChart extends React.Component {
   constructor(props) {
