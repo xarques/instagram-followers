@@ -9,7 +9,7 @@ h1 {
 .graphTitle {
   margin: 0px 20px 0px 0px;
   display: flex;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 .graphTitle p {
